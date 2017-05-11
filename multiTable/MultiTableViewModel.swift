@@ -14,30 +14,21 @@ struct CellDataInfo {
     var title: String
     var children: [CellDataInfo]?
     
-    // let deepnessLevel: Int //for root cells - 0, first child - 1, etc.
-    // this is cool! but it shouldn't be here! :)
 }
 
 class NextLevelTableInfo {
     weak var viewModelParent: MultiTableViewModel?
     var cellDataInfoArr: [CellDataInfo]
     var deepnessLevel: Int
-//    var dataInfoDataSource: DataInfoDataSource?
     var table: UITableView?
     
     init(viewModelParent: MultiTableViewModel?, cellDataInfoArr: [CellDataInfo], deepnessLevel: Int, table: UITableView?) {
         self.viewModelParent = viewModelParent
         self.cellDataInfoArr = cellDataInfoArr
         self.deepnessLevel = deepnessLevel
-//        self.dataInfoDataSource = dataInfoDataSource
         self.table = table
     }
 }
-
-//protocol DataInfoDataSource: class {
-//    func getCelDataInfoArrForCellWith(realIndex: Int, deepnessLevel: Int) -> [CellDataInfo]?
-//}
-
 
 class MultiTableViewModel: NSObject {
     
@@ -51,7 +42,6 @@ class MultiTableViewModel: NSObject {
 
     var cellTypeArr: [CellType]?
     var cellDataInfoArr: [CellDataInfo]?
-//    weak var dataInfoDataSource: DataInfoDataSource?
     
     weak var table: UITableView?
     weak var tableHeightConstraint: NSLayoutConstraint?
@@ -69,7 +59,6 @@ class MultiTableViewModel: NSObject {
         parent = currentLevelTableInfo.viewModelParent
         cellDataInfoArr = currentLevelTableInfo.cellDataInfoArr
         tableDeepnessLevel = currentLevelTableInfo.deepnessLevel
-//        dataInfoDataSource = currentLevelTableInfo.dataInfoDataSource
         
         cellTypeArr = []
         for index in 0..<cellDataInfoArr!.count {
