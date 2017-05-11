@@ -17,6 +17,8 @@ class TableTableViewCell: UITableViewCell {
 
     @IBOutlet weak var table: UITableView! {
         didSet {
+            currentLevelTableInfo?.table = table
+            
             viewModel = MultiTableViewModel()
             viewModel?.load(currentLevelTableInfo: currentLevelTableInfo!)
             viewModel?.setup(addTableHeightConstraint: true)

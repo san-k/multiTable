@@ -19,13 +19,11 @@ struct CellDataInfo {
 class NextLevelTableInfo {
     weak var viewModelParent: MultiTableViewModel?
     var cellDataInfoArr: [CellDataInfo]
-    var deepnessLevel: Int
     var table: UITableView?
     
-    init(viewModelParent: MultiTableViewModel?, cellDataInfoArr: [CellDataInfo], deepnessLevel: Int, table: UITableView?) {
+    init(viewModelParent: MultiTableViewModel?, cellDataInfoArr: [CellDataInfo], table: UITableView?) {
         self.viewModelParent = viewModelParent
         self.cellDataInfoArr = cellDataInfoArr
-        self.deepnessLevel = deepnessLevel
         self.table = table
     }
 }
@@ -58,7 +56,7 @@ class MultiTableViewModel: NSObject {
         
         parent = currentLevelTableInfo.viewModelParent
         cellDataInfoArr = currentLevelTableInfo.cellDataInfoArr
-        tableDeepnessLevel = currentLevelTableInfo.deepnessLevel
+        table = currentLevelTableInfo.table
         
         cellTypeArr = []
         for index in 0..<cellDataInfoArr!.count {
@@ -93,7 +91,8 @@ class MultiTableViewModel: NSObject {
                     localParent = localParent!.parent
                 }
 
-                tableHeightConstraint = table.heightAnchor.constraint(equalToConstant: table.contentSize.height)
+                let constraint = table.heightAnchor.constraint(equalToConstant: table.contentSize.height)
+                tableHeightConstraint = constraint  // this is just because tableHeightConstraint is weak
                 tableHeightConstraint!.isActive = true
             }
         }
@@ -140,7 +139,7 @@ extension MultiTableViewModel: UITableViewDelegate {
         
         guard case let CellType.simpleCell(realIndex) = cellTypeArr[indexPath.row] else { return }
         guard let nextLvlInfoArr = cellDataInfoArr?[realIndex].children else { return }
-        let nextLevelTableInfo = NextLevelTableInfo(viewModelParent: self, cellDataInfoArr: nextLvlInfoArr, deepnessLevel: tableDeepnessLevel + 1, table: nil)
+        let nextLevelTableInfo = NextLevelTableInfo(viewModelParent: self, cellDataInfoArr: nextLvlInfoArr, table: nil)
         cellTypeArr.insert(.tableCell(currentLevelTableInfo: nextLevelTableInfo), at: indexPath.row + 1)
         
         tableView.beginUpdates()
