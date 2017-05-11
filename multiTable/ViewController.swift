@@ -8,10 +8,47 @@
 
 import UIKit
 
+func getArr(color: UIColor, title: String, count: Int) -> [CellDataInfo] {
+    var arr = [CellDataInfo]()
+    
+    for a in 0 ..< count {
+        let element = CellDataInfo(backgroungColor: color, title: "\(title) \(a)", children: nil)
+        arr.append(element)
+    }
+    return arr
+}
+
 class ViewController: UIViewController {
 
     var viewModel: MultiTableViewModel?
-    lazy var fullCellDataInfoArr = [CellDataInfo]()
+    lazy var fullCellDataInfoArr: [CellDataInfo] =  {
+        // let arr = [CellDataInfo]()
+
+        let arr_level3_row_1 = getArr(color: .blue, title: "First Row Level 3. ", count: 5)
+        
+        var arr_level2_row_1 = getArr(color: .yellow, title: "First Row Level 2. ", count: 5)
+        arr_level2_row_1[0].children = arr_level3_row_1
+        
+        
+        let arr_level2_row_2 = getArr(color: .yellow, title: "Second Row Level 2. ", count: 5)
+        let arr_level2_row_3 = getArr(color: .yellow, title: "Third Row Level 2. ", count: 5)
+        let arr_level2_row_4 = getArr(color: .yellow, title: "Fourth Row Level 2. ", count: 5)
+        let arr_level2_row_5 = getArr(color: .yellow, title: "Fifth Row Level 2. ", count: 5)
+        
+        var arr_level1 = getArr(color: .green, title: "Level 1. ", count: 5)
+        
+        arr_level1[0].children = arr_level2_row_1
+        arr_level1[1].children = arr_level2_row_2
+        arr_level1[2].children = arr_level2_row_3
+        arr_level1[3].children = arr_level2_row_4
+        arr_level1[4].children = arr_level2_row_5
+
+        
+        
+        return arr_level1
+    }()
+    
+    
     
     @IBOutlet weak var table: UITableView! {
         didSet {
@@ -25,56 +62,4 @@ class ViewController: UIViewController {
         }
     }
 
-    
-//    override func viewDidLoad() {
-//        super.viewDidLoad()
-//        
-//        table.register(UINib(nibName: "SimpleTableViewCell", bundle: nil), forCellReuseIdentifier: "SimpleTableViewCell")
-//        table.register(UINib(nibName: "TableTableViewCell", bundle: nil), forCellReuseIdentifier: "TableTableViewCell")
-//        
-//        table.estimatedRowHeight = 40
-//        table.rowHeight = UITableViewAutomaticDimension
-//        
-//    }
-
 }
-
-//extension ViewController: UITableViewDataSource {
-//    
-//    func numberOfSections(in tableView: UITableView) -> Int {
-//        return 1
-//    }
-//    
-//    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-//        return cellInfoArr.count
-//    }
-//    
-//    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-//        guard cellInfoArr.count > indexPath.row else {return UITableViewCell() }
-//        
-//        let cellInfo = cellInfoArr[indexPath.row]
-//        switch cellInfo {
-//        case let .simpleCell(text):
-//            guard let cell = tableView.dequeueReusableCell(withIdentifier: "SimpleTableViewCell", for: indexPath) as? SimpleTableViewCell else { return UITableViewCell() }
-//            cell.label.text = text
-//            return cell
-//        case .tableCell:
-//            guard let cell = tableView.dequeueReusableCell(withIdentifier: "TableTableViewCell", for: indexPath) as? TableTableViewCell else { return UITableViewCell() }
-//            return cell
-//        }
-//        
-//    }
-//}
-//
-//extension ViewController: UITableViewDelegate {
-//    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        guard cellInfoArr.count > indexPath.row else { return }
-//        cellInfoArr.insert(.tableCell, at: indexPath.row + 1)
-//        
-//        tableView.beginUpdates()
-//        tableView.insertRows(at: [IndexPath(row: indexPath.row + 1, section: indexPath.section)], with: UITableViewRowAnimation.automatic)
-//        tableView.endUpdates()
-//        
-//        
-//    }
-//}

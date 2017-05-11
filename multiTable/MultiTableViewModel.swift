@@ -140,7 +140,7 @@ extension MultiTableViewModel: UITableViewDelegate {
         guard case let CellType.simpleCell(realIndex) = cellTypeArr[indexPath.row] else { return }
         guard let nextLvlInfoArr = cellDataInfoArr?[realIndex].children else { return }
         let nextLevelTableInfo = NextLevelTableInfo(viewModelParent: self, cellDataInfoArr: nextLvlInfoArr, table: nil)
-        cellTypeArr.insert(.tableCell(currentLevelTableInfo: nextLevelTableInfo), at: indexPath.row + 1)
+        self.cellTypeArr!.insert(.tableCell(currentLevelTableInfo: nextLevelTableInfo), at: indexPath.row + 1)
         
         tableView.beginUpdates()
         tableView.insertRows(at: [IndexPath(row: indexPath.row + 1, section: indexPath.section)], with: UITableViewRowAnimation.automatic)

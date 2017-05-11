@@ -11,11 +11,7 @@ import UIKit
 class TableTableViewCell: UITableViewCell {
 
     // need to set!!!
-    var currentLevelTableInfo: NextLevelTableInfo?
-    
-    fileprivate var viewModel: MultiTableViewModel?
-
-    @IBOutlet weak var table: UITableView! {
+    var currentLevelTableInfo: NextLevelTableInfo? {
         didSet {
             currentLevelTableInfo?.table = table
             
@@ -25,6 +21,10 @@ class TableTableViewCell: UITableViewCell {
         }
     }
 
+    
+    fileprivate var viewModel: MultiTableViewModel?
+
+    @IBOutlet weak var table: UITableView!
 }
 
 
