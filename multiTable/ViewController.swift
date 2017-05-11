@@ -17,7 +17,7 @@ class ViewController: UIViewController {
         didSet {
             
             viewModel = MultiTableViewModel()
-            let currentLevelTableInfo = NextLevelTableInfo(viewModelParent: nil, cellDataInfoArr: fullCellDataInfoArr, deepnessLevel: 0, table: table)
+            let currentLevelTableInfo = NextLevelTableInfo(viewModelParent: nil, cellDataInfoArr: fullCellDataInfoArr, table: table)
             viewModel?.load(currentLevelTableInfo: currentLevelTableInfo)
             viewModel?.setup(addTableHeightConstraint: false)
             
