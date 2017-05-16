@@ -27,17 +27,16 @@ class ViewController: UIViewController {
     lazy var fullCellDataInfoArr: [CellDataInfo] =  {
         // let arr = [CellDataInfo]()
 
-        let arr_level3_row_1 = getArr(color: .blue, title: "First Row Level 3. ", count: 5)
         
         var arr_level2_row_1 = getArr(color: .yellow, title: "First Row Level 2. ", count: 5)
-        arr_level2_row_1[0].children = arr_level3_row_1
-        
-        
         let arr_level2_row_2 = getArr(color: .yellow, title: "Second Row Level 2. ", count: 5)
         let arr_level2_row_3 = getArr(color: .yellow, title: "Third Row Level 2. ", count: 5)
         let arr_level2_row_4 = getArr(color: .yellow, title: "Fourth Row Level 2. ", count: 5)
         let arr_level2_row_5 = getArr(color: .yellow, title: "Fifth Row Level 2. ", count: 5)
-        
+
+        let arr_level3_row_1 = getArr(color: .blue, title: "First Row Level 3. ", count: 5)
+        arr_level2_row_1[1].children = arr_level3_row_1
+
         var arr_level1 = getArr(color: .green, title: "Level 1. ", count: 5)
         
         arr_level1[0].children = arr_level2_row_1
@@ -53,7 +52,7 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         viewModel.parent = nil
-        viewModel.rowInParrentCell = 0 // it doesnt metter, coz parrent is nil.
+        // viewModel.indexPathInParrentCell -> it doesnt metter, coz parrent is nil.
         viewModel.cellDataInfoArr = fullCellDataInfoArr
         viewModel.table = table
         viewModel.setup()

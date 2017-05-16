@@ -28,21 +28,21 @@ class MultiTableViewModel: NSObject {
     weak var parent: MultiTableViewModel?
     var cellDataInfoArr: [CellDataInfo]?
     weak var table: UITableView?
-    var rowInParrentCell: NSInteger = 0
-
-    
-    var cellTypeArr: [CellType]?
-    
+    var indexPathInParrentCell = IndexPath()
     weak var tableHeightConstraint: NSLayoutConstraint?
+
     var tableHeight: CGFloat? {
         get {return tableHeightConstraint?.constant }
         set(newHeight) {
             if let height = newHeight, let tableHeightConstraint = tableHeightConstraint {
-                    tableHeightConstraint.constant = height
+                tableHeightConstraint.constant = height
             }
         }
     }
 
+
+    
+    var cellTypeArr: [CellType]?
     
     func setup(addTableHeightConstraint: Bool = false) {
         
@@ -65,15 +65,25 @@ class MultiTableViewModel: NSObject {
                 table.reloadData()
                 table.layoutSubviews()
                 let neededHeight = table.contentSize.height
+                tableHeight = neededHeight
                 // and this is the height we need to add to all parents
                 
-                // this is bad becouse of reuse!
-                let constraint = table.heightAnchor.constraint(equalToConstant: neededHeight)
-                tableHeightConstraint = constraint  // this is just because tableHeightConstraint is weak
-                tableHeightConstraint?.priority = 999.0
+                parent?.table?.reloadRows(at: [indexPathInParrentCell], with: UITableViewRowAnimation.none)
+                if parent?.tableHeight != nil {
+                    parent!.tableHeight! += neededHeight
+                }
                 
-                tableHeightConstraint!.isActive = true
-
+                
+                if let superParent = parent?.parent {
+                    let newIndexPath = parent!.indexPathInParrentCell
+                    superParent.table?.reloadRows(at: [newIndexPath], with: UITableViewRowAnimation.none)
+                
+                }
+                
+                
+                
+                
+                
 //                var localParent = parent
 //                while localParent != nil {
 //                    if localParent!.tableHeight != nil {
@@ -121,7 +131,8 @@ extension MultiTableViewModel: UITableViewDataSource {
             cell.viewModel.table = cell.table
             cell.viewModel.parent = self
             cell.viewModel.cellDataInfoArr = cellDataInfoArr
-            cell.viewModel.rowInParrentCell = indexPath.row
+            cell.viewModel.indexPathInParrentCell = indexPath
+            cell.viewModel.tableHeightConstraint = cell.tableHeightConstraint
             cell.viewModel.setup(addTableHeightConstraint: true)
            return cell
         }

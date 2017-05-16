@@ -12,6 +12,7 @@ class TableTableViewCell: UITableViewCell {
     
     var viewModel: MultiTableViewModel = MultiTableViewModel()
     @IBOutlet weak var table: UITableView!
+    @IBOutlet weak var tableHeightConstraint: NSLayoutConstraint!
 }
 
 

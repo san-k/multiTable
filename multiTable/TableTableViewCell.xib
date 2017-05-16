@@ -21,6 +21,9 @@
                     <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" scrollEnabled="NO" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="waC-dT-r8H">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="207"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="height" priority="999" constant="207" id="UO4-tD-hYl"/>
+                        </constraints>
                     </tableView>
                 </subviews>
                 <constraints>
@@ -32,6 +35,7 @@
             </tableViewCellContentView>
             <connections>
                 <outlet property="table" destination="waC-dT-r8H" id="SCd-pp-JK6"/>
+                <outlet property="tableHeightConstraint" destination="UO4-tD-hYl" id="7D7-47-a6P"/>
             </connections>
             <point key="canvasLocation" x="25" y="-30"/>
         </tableViewCell>
