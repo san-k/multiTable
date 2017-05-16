@@ -16,56 +16,40 @@ struct CellDataInfo {
     
 }
 
-class NextLevelTableInfo {
-    weak var viewModelParent: MultiTableViewModel?
-    var cellDataInfoArr: [CellDataInfo]
-    var table: UITableView?
-    
-    init(viewModelParent: MultiTableViewModel?, cellDataInfoArr: [CellDataInfo], table: UITableView?) {
-        self.viewModelParent = viewModelParent
-        self.cellDataInfoArr = cellDataInfoArr
-        self.table = table
-    }
-}
 
 class MultiTableViewModel: NSObject {
     
     enum CellType {
         case simpleCell(realIndex: Int) // with real index we are able to take info from cellDataInfoArr
-        case tableCell(currentLevelTableInfo: NextLevelTableInfo)
+        case tableCell(cellDataInfoArr: [CellDataInfo])
     }
     
+    // properties to setup
     weak var parent: MultiTableViewModel?
-    var tableDeepnessLevel: Int = 0
-
-    var cellTypeArr: [CellType]?
     var cellDataInfoArr: [CellDataInfo]?
-    
     weak var table: UITableView?
+    var rowInParrentCell: NSInteger = 0
+
+    
+    var cellTypeArr: [CellType]?
+    
     weak var tableHeightConstraint: NSLayoutConstraint?
     var tableHeight: CGFloat? {
         get {return tableHeightConstraint?.constant }
         set(newHeight) {
-            if let height = newHeight {
-                tableHeightConstraint?.constant = height
+            if let height = newHeight, let tableHeightConstraint = tableHeightConstraint {
+                    tableHeightConstraint.constant = height
             }
         }
     }
+
     
-    func load(currentLevelTableInfo: NextLevelTableInfo) {
-        
-        parent = currentLevelTableInfo.viewModelParent
-        cellDataInfoArr = currentLevelTableInfo.cellDataInfoArr
-        table = currentLevelTableInfo.table
+    func setup(addTableHeightConstraint: Bool = false) {
         
         cellTypeArr = []
         for index in 0..<cellDataInfoArr!.count {
             cellTypeArr?.append(.simpleCell(realIndex: index))
         }
-
-    }
-    
-    func setup(addTableHeightConstraint: Bool = false) {
         
         if let table = table {
             table.register(UINib(nibName: "SimpleTableViewCell", bundle: nil), forCellReuseIdentifier: "SimpleTableViewCell")
@@ -83,17 +67,25 @@ class MultiTableViewModel: NSObject {
                 let neededHeight = table.contentSize.height
                 // and this is the height we need to add to all parents
                 
-                var localParent = parent
-                while localParent != nil {
-                    if var tableHeight = localParent!.tableHeight {
-                        tableHeight += neededHeight
-                    }
-                    localParent = localParent!.parent
-                }
-
-                let constraint = table.heightAnchor.constraint(equalToConstant: table.contentSize.height)
+                // this is bad becouse of reuse!
+                let constraint = table.heightAnchor.constraint(equalToConstant: neededHeight)
                 tableHeightConstraint = constraint  // this is just because tableHeightConstraint is weak
+                tableHeightConstraint?.priority = 999.0
+                
                 tableHeightConstraint!.isActive = true
+
+//                var localParent = parent
+//                while localParent != nil {
+//                    if localParent!.tableHeight != nil {
+//                        localParent!.table!.beginUpdates()
+//                        localParent!.tableHeight! += neededHeight
+//                        localParent!.parent?.table?.reloadData()
+//                        localParent!.table!.endUpdates()
+//                        // localParent!.table?.layoutSubviews()
+//                        
+//                    }
+//                    localParent = localParent!.parent
+//                }
             }
         }
     }
@@ -124,9 +116,13 @@ extension MultiTableViewModel: UITableViewDataSource {
             cell.label.text = cellDataInfo.title
             return cell
 
-        case let .tableCell(currentLevelTableInfo):
+        case let .tableCell(cellDataInfoArr):
             guard let cell = tableView.dequeueReusableCell(withIdentifier: "TableTableViewCell", for: indexPath) as? TableTableViewCell else { return UITableViewCell() }
-            cell.currentLevelTableInfo = currentLevelTableInfo
+            cell.viewModel.table = cell.table
+            cell.viewModel.parent = self
+            cell.viewModel.cellDataInfoArr = cellDataInfoArr
+            cell.viewModel.rowInParrentCell = indexPath.row
+            cell.viewModel.setup(addTableHeightConstraint: true)
            return cell
         }
         
@@ -139,8 +135,8 @@ extension MultiTableViewModel: UITableViewDelegate {
         
         guard case let CellType.simpleCell(realIndex) = cellTypeArr[indexPath.row] else { return }
         guard let nextLvlInfoArr = cellDataInfoArr?[realIndex].children else { return }
-        let nextLevelTableInfo = NextLevelTableInfo(viewModelParent: self, cellDataInfoArr: nextLvlInfoArr, table: nil)
-        self.cellTypeArr!.insert(.tableCell(currentLevelTableInfo: nextLevelTableInfo), at: indexPath.row + 1)
+        
+        self.cellTypeArr!.insert(.tableCell(cellDataInfoArr: nextLvlInfoArr), at: indexPath.row + 1)
         
         tableView.beginUpdates()
         tableView.insertRows(at: [IndexPath(row: indexPath.row + 1, section: indexPath.section)], with: UITableViewRowAnimation.automatic)

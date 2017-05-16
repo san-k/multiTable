@@ -9,21 +9,8 @@
 import UIKit
 
 class TableTableViewCell: UITableViewCell {
-
-    // need to set!!!
-    var currentLevelTableInfo: NextLevelTableInfo? {
-        didSet {
-            currentLevelTableInfo?.table = table
-            
-            viewModel = MultiTableViewModel()
-            viewModel?.load(currentLevelTableInfo: currentLevelTableInfo!)
-            viewModel?.setup(addTableHeightConstraint: true)
-        }
-    }
-
     
-    fileprivate var viewModel: MultiTableViewModel?
-
+    var viewModel: MultiTableViewModel = MultiTableViewModel()
     @IBOutlet weak var table: UITableView!
 }
 

@@ -20,7 +20,10 @@ func getArr(color: UIColor, title: String, count: Int) -> [CellDataInfo] {
 
 class ViewController: UIViewController {
 
-    var viewModel: MultiTableViewModel?
+    var viewModel: MultiTableViewModel = MultiTableViewModel()
+    @IBOutlet weak var table: UITableView!
+
+    
     lazy var fullCellDataInfoArr: [CellDataInfo] =  {
         // let arr = [CellDataInfo]()
 
@@ -48,18 +51,11 @@ class ViewController: UIViewController {
         return arr_level1
     }()
     
-    
-    
-    @IBOutlet weak var table: UITableView! {
-        didSet {
-            
-            viewModel = MultiTableViewModel()
-            let currentLevelTableInfo = NextLevelTableInfo(viewModelParent: nil, cellDataInfoArr: fullCellDataInfoArr, table: table)
-            viewModel?.load(currentLevelTableInfo: currentLevelTableInfo)
-            viewModel?.setup(addTableHeightConstraint: false)
-            
-            
-        }
+    override func viewDidLoad() {
+        viewModel.parent = nil
+        viewModel.rowInParrentCell = 0 // it doesnt metter, coz parrent is nil.
+        viewModel.cellDataInfoArr = fullCellDataInfoArr
+        viewModel.table = table
+        viewModel.setup()
     }
-
 }
