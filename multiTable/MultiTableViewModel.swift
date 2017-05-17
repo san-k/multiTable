@@ -24,6 +24,11 @@ class MultiTableViewModel: NSObject {
         case tableCell(cellDataInfoArr: [CellDataInfo])
     }
     
+    fileprivate enum SetupType {
+        case reuseCell
+        case updateParrent(amountOfIncrease: CGFloat)
+    }
+    
     // properties to setup
     weak var parent: MultiTableViewModel?
     var cellDataInfoArr: [CellDataInfo]?
@@ -31,20 +36,21 @@ class MultiTableViewModel: NSObject {
     var indexPathInParrentCell = IndexPath()
     weak var tableHeightConstraint: NSLayoutConstraint?
 
-    var tableHeight: CGFloat? {
-        get {return tableHeightConstraint?.constant }
+    var tableHeight: CGFloat {
+        get {return tableHeightConstraint?.constant ?? 0.0}
         set(newHeight) {
-            if let height = newHeight, let tableHeightConstraint = tableHeightConstraint {
-                tableHeightConstraint.constant = height
+            if let tableHeightConstraint = tableHeightConstraint {
+                tableHeightConstraint.constant = newHeight
             }
         }
     }
 
+    fileprivate var setupType: SetupType = .reuseCell
 
     
     var cellTypeArr: [CellType]?
     
-    func setup(addTableHeightConstraint: Bool = false) {
+    func setup() {
         
         cellTypeArr = []
         for index in 0..<cellDataInfoArr!.count {
@@ -61,41 +67,33 @@ class MultiTableViewModel: NSObject {
             table.dataSource = self
             table.delegate = self
             
-            if addTableHeightConstraint {
+            switch setupType {
+            case .reuseCell:
+                guard tableHeightConstraint != nil else { break }
                 table.reloadData()
                 table.layoutSubviews()
                 let neededHeight = table.contentSize.height
                 tableHeight = neededHeight
                 // and this is the height we need to add to all parents
                 
-                parent?.table?.reloadRows(at: [indexPathInParrentCell], with: UITableViewRowAnimation.none)
-                if parent?.tableHeight != nil {
-                    parent!.tableHeight! += neededHeight
+                if let parent = parent {
+                    parent.setupType = .updateParrent(amountOfIncrease: neededHeight)
+                    parent.table!.reloadRows(at: [indexPathInParrentCell], with: UITableViewRowAnimation.none)
+                }
+
+            case let .updateParrent(amountOfIncrease):
+                
+                // here our cell is with good height
+                // but if table on this level is also in cell
+                // we need update table height, and then update parent cell
+                
+                if let parent = parent {
+                    tableHeight += amountOfIncrease
+                    parent.setupType = .updateParrent(amountOfIncrease: amountOfIncrease)
+                    parent.table?.reloadRows(at: [indexPathInParrentCell], with: UITableViewRowAnimation.none)
                 }
                 
-                
-                if let superParent = parent?.parent {
-                    let newIndexPath = parent!.indexPathInParrentCell
-                    superParent.table?.reloadRows(at: [newIndexPath], with: UITableViewRowAnimation.none)
-                
-                }
-                
-                
-                
-                
-                
-//                var localParent = parent
-//                while localParent != nil {
-//                    if localParent!.tableHeight != nil {
-//                        localParent!.table!.beginUpdates()
-//                        localParent!.tableHeight! += neededHeight
-//                        localParent!.parent?.table?.reloadData()
-//                        localParent!.table!.endUpdates()
-//                        // localParent!.table?.layoutSubviews()
-//                        
-//                    }
-//                    localParent = localParent!.parent
-//                }
+                setupType = .reuseCell
             }
         }
     }
@@ -131,9 +129,9 @@ extension MultiTableViewModel: UITableViewDataSource {
             cell.viewModel.table = cell.table
             cell.viewModel.parent = self
             cell.viewModel.cellDataInfoArr = cellDataInfoArr
-            cell.viewModel.indexPathInParrentCell = indexPath
+            cell.viewModel.indexPathInParrentCell = IndexPath(row: indexPath.row + 1, section: indexPath.section)
             cell.viewModel.tableHeightConstraint = cell.tableHeightConstraint
-            cell.viewModel.setup(addTableHeightConstraint: true)
+            cell.viewModel.setup()
            return cell
         }
         
@@ -149,8 +147,8 @@ extension MultiTableViewModel: UITableViewDelegate {
         
         self.cellTypeArr!.insert(.tableCell(cellDataInfoArr: nextLvlInfoArr), at: indexPath.row + 1)
         
-        tableView.beginUpdates()
+        // tableView.beginUpdates()
         tableView.insertRows(at: [IndexPath(row: indexPath.row + 1, section: indexPath.section)], with: UITableViewRowAnimation.automatic)
-        tableView.endUpdates()
+        // tableView.endUpdates()
     }
 }
